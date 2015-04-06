@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'colorize'
+# Having fun with colorize
 
+require 'colorize'
 
 puzzle = File.open('puzzle_easy.txt').readlines
 puzzle.map! {|line| line.strip.gsub('.',' ') }
