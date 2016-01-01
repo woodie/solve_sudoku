@@ -1,25 +1,27 @@
 #!/usr/bin/env ruby
 
-# Having fun with colorize
-
-require 'colorize'
+class String
+ def blue;  "\e[34m#{self}\e[0m" end
+ def brown; "\e[33m#{self}\e[0m" end
+ def reset; self.gsub(/\e\[(\d+)m/,'') end
+end
 
 puzzle = File.open('puzzle_easy.txt').readlines
 puzzle.map! {|line| line.strip.gsub('.',' ') }
 
 def render_board(puzzle)
-  border = %w(+ + + +).join("---+---+---".yellow)
+  border = %w(+ + + +).join("---+---+---".brown)
   puts ""
   puzzle.each_with_index do |row,n|
-    puts n % 3 == 0 ? border.black : border
+    puts n % 3 == 0 ? border.reset : border
     row.each_char.with_index do |c,i|
-      bar_color = i % 3 == 0 ? :black : :yellow
-      print "| ".colorize(bar_color)
+      bar_color = i % 3 == 0 ? :reset : :brown
+      print "| ".send(bar_color)
       print c.blue + " "
     end
-    puts "|".black
+    puts "|"
   end
-  puts border.black
+  puts border.reset
   puts ""
 end
 
