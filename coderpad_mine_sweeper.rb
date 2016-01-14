@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
-SIZE = 10
-NUMS = '０１２３４５６７８９' # Special unicode
-LETS = 'ａｂｃｄｅｆｇｈｉｊ' # full-width chars
+NUMS = '０１２３４５６７８９ＡＢＣＤＥＦ' # FULLWIDTH LATIN
+LETS = 'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐ' # SMALL LETTERS
 CPAD = ENV["HOME"] == "/home/coderpad"
+TILE = CPAD ? '⃞' : '＇'
+SIZE = 16
 
 class String
   def bold;  "\e[1m#{self}\e[22m" end
@@ -18,22 +19,21 @@ class String
 end
 
 class Cell
-  attr_accessor :is_mine, :revealed, :exploded, :visited, :count
+  attr_accessor :is_mine, :revealed, :exploded, :count
   def initialize(is_mine=false)
     self.is_mine = is_mine
     self.revealed = false
     self.exploded = false
-    self.visited = false
     self.count = 0
   end
 
   def to_s
     if !revealed
-      return CPAD ? '⃞'.flip : '＇'.flip
+      return TILE.flip
     elsif is_mine
       return exploded ? '＊'.bgred : '＊'.flip.blue
     elsif count == 0
-      return CPAD ? '⃞'.gray : '＇'.gray
+      return TILE.gray
     elsif count == 1
       return NUMS[count].bold.cyan
     elsif count == 2
@@ -45,20 +45,19 @@ class Cell
 end
 
 class Board
-  attr_accessor :board
-  def initialize(num_mines)
-    @board = board = Array.new(SIZE) {Array.new(SIZE) {0}}
+  def initialize(num_mines=SIZE)
+    @board = Array.new(SIZE) {Array.new(SIZE) {0}}
     @to_do = SIZE * SIZE - num_mines
     candidates = (0..((SIZE * SIZE) - 1)).to_a.shuffle.first(num_mines)
     0.upto(SIZE - 1) do |one|
       0.upto(SIZE - 1) do |two|
         comp = candidates.include?((SIZE * one) + (two % SIZE))
-        board[one][two] = Cell.new(comp)
+        @board[one][two] = Cell.new(comp)
       end
     end
     0.upto(SIZE - 1) do |one|
       0.upto(SIZE - 1) do |two|
-        cell = board[one][two]
+        cell = @board[one][two]
         cell.count = calculate(one, two) unless cell.is_mine
       end
     end
@@ -70,7 +69,7 @@ class Board
     print "\n ｀".brown
     0.upto(SIZE - 1) {|n| print LETS[n].brown}
     print "\n"
-    board.each_with_index do |row,r|
+    @board.each_with_index do |row,r|
       print " " + NUMS[r].brown
       row.each_with_index do |cell,c|
         print "#{cell}"
@@ -93,13 +92,12 @@ class Board
   def cascade(x,y)
     cell = @board[x][y]
     cell.revealed = true
-    cell.visited = true
     @to_do -= 1
     if cell.count == 0
       ([x - 1, 0].max..[x + 1, SIZE - 1].min).each do |row|
         ([y - 1, 0].max..[y + 1, SIZE - 1].min).each do |col|
           neighbor = @board[row][col]
-          cascade(row, col) unless neighbor.is_mine or neighbor.visited
+          cascade(row, col) unless neighbor.is_mine or neighbor.revealed
         end
       end
     end
@@ -108,7 +106,7 @@ class Board
   def show_mines
     0.upto(SIZE - 1) do |one|
       0.upto(SIZE - 1) do |two|
-        cell = board[one][two]
+        cell = @board[one][two]
         cell.revealed = true if cell.is_mine
       end
     end
@@ -117,9 +115,11 @@ class Board
 
   def check(str)
     y = str[0].bytes.first - 97
-    x = str[1].to_i
+    x = str[1].bytes.first - 55
+    x +=7 if x < 10
     unless (0..SIZE).include? x and (0..SIZE).include? y
       puts "\n  Invalid input.\n"
+      sleep(2)
       return
     end
     cell = @board[x][y]
@@ -141,7 +141,7 @@ class Board
 end
 
 def r
-  myboard = Board.new(10)
+  myboard = Board.new()
   while(true)
     myboard.render
     print "\n > "
