@@ -41,7 +41,7 @@ class Cell
     elsif is_mine
       return exploded ? '＊'.bgred : '＊'.flip.blue
     elsif count == 0
-      return CPAD ? '⃞'.grey : '＇'.gray
+      return CPAD ? '⃞'.gray : '＇'.gray
     elsif is_mine
     elsif count == 1
       return NUMS[count].bold.cyan
@@ -160,7 +160,7 @@ puts "\n    💣  MINE SWEEPER 💣\n"
 end
 
 if CPAD
-  puts "\n  Type 'r' to get start playing."
+  puts "\n  Type 'r' to start playing."
 else
   r
 end
