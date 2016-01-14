@@ -65,6 +65,8 @@ class Board
   end
 
   def render
+    puts "\e[H\e[2J"
+    puts "\n   💣 MINE SWEEPER\n"
     print "\n ｀".brown
     0.upto(SIZE - 1) {|n| print LETS[n].brown}
     print "\n"
@@ -117,21 +119,21 @@ class Board
     y = str[0].bytes.first - 97
     x = str[1].to_i
     unless (0..SIZE).include? x and (0..SIZE).include? y
-      puts "\n  Invalid input."
+      puts "\n  Invalid input.\n"
       return
     end
     cell = @board[x][y]
     if cell.is_mine
       cell.exploded = true
       show_mines
-      puts "\n You lost!"
-      sleep(3)
+      puts "\n You lost!\n"
+      sleep(3) if CPAD
       exit
     else
       cascade(x, y)
       if @to_do < 1
         show_mines
-        puts "\n You won!"
+        puts "\n You won!\n"
         exit
       end
     end
@@ -139,7 +141,6 @@ class Board
 end
 
 def r
-puts "\n    💣  MINE SWEEPER 💣 \n"
   myboard = Board.new(10)
   while(true)
     myboard.render
