@@ -27,14 +27,6 @@ class Cell
     self.count = 0
   end
 
-  def reveal
-    self.revealed = true
-  end
-
-  def explode
-    self.exploded = true
-  end
-
   def to_s
     if !revealed
       return CPAD ? '⃞'.flip : '＇'.flip
@@ -42,7 +34,6 @@ class Cell
       return exploded ? '＊'.bgred : '＊'.flip.blue
     elsif count == 0
       return CPAD ? '⃞'.gray : '＇'.gray
-    elsif is_mine
     elsif count == 1
       return NUMS[count].bold.cyan
     elsif count == 2
@@ -57,7 +48,7 @@ class Board
   attr_accessor :board
   def initialize(num_mines)
     @board = board = Array.new(SIZE) {Array.new(SIZE) {0}}
-    @work = SIZE * SIZE - num_mines
+    @to_do = SIZE * SIZE - num_mines
     candidates = (0..((SIZE * SIZE) - 1)).to_a.shuffle.first(num_mines)
     0.upto(SIZE - 1) do |one|
       0.upto(SIZE - 1) do |two|
@@ -99,9 +90,9 @@ class Board
 
   def cascade(x,y)
     cell = @board[x][y]
-    cell.reveal
+    cell.revealed = true
     cell.visited = true
-    @work -= 1
+    @to_do -= 1
     if cell.count == 0
       ([x - 1, 0].max..[x + 1, SIZE - 1].min).each do |row|
         ([y - 1, 0].max..[y + 1, SIZE - 1].min).each do |col|
@@ -116,7 +107,7 @@ class Board
     0.upto(SIZE - 1) do |one|
       0.upto(SIZE - 1) do |two|
         cell = board[one][two]
-        cell.reveal if cell.is_mine
+        cell.revealed = true if cell.is_mine
       end
     end
     render
@@ -138,7 +129,7 @@ class Board
       exit
     else
       cascade(x, y)
-      if @work < 1
+      if @to_do < 1
         show_mines
         puts "\n You won!"
         exit
@@ -148,7 +139,7 @@ class Board
 end
 
 def r
-puts "\n    💣  MINE SWEEPER 💣\n"
+puts "\n    💣  MINE SWEEPER 💣 \n"
   myboard = Board.new(10)
   while(true)
     myboard.render
