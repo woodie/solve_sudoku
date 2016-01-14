@@ -136,6 +136,7 @@ class Board
       cell.exploded = true
       show_mines
       puts "\n You lost!"
+      sleep(3)
       exit
     else
       cascade(x, y)
@@ -148,8 +149,7 @@ class Board
   end
 end
 
-
-def play
+def r
 puts "\n    💣  MINE SWEEPER 💣\n"
   myboard = Board.new(10)
   while(true)
@@ -164,5 +164,5 @@ end
 if ENV["HOME"] == "/home/coderpad"
   puts "\n  Type 'r' to get start playing."
 else
-  play
+  r
 end
