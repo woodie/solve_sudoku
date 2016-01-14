@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+SIZE = 10
+NUMS = '０１２３４５６７８９' # Special unicode
+LETS = 'ａｂｃｄｅｆｇｈｉｊ' # fill-width chars
+CPAD = ENV["HOME"] == "/home/coderpad"
+
 class String
   def bold;  "\e[1m#{self}\e[22m" end
   def flip;  "\e[7m#{self}\e[27m" end
@@ -10,27 +15,20 @@ class String
   def cyan;  "\e[36m#{self}\e[0m" end
   def gray;  "\e[37m#{self}\e[0m" end
   def bgred; "\e[41m#{self}\e[0m" end
-  def bgbrn; "\e[43m#{self}\e[0m" end
-  def bggry; "\e[47m#{self}\e[0m" end
-  def reset; self.gsub(/\e\[(\d+)m/,'') end
 end
 
-SIZE = 10
-NUMS = '０１２３４５６７８９' # Special unicode
-LETS = 'ａｂｃｄｅｆｇｈｉｊ' # fill-width chars
-
 class Cell
-  attr_accessor :is_mine, :reveald, :exploded, :visited, :count
+  attr_accessor :is_mine, :revealed, :exploded, :visited, :count
   def initialize(is_mine=false)
     self.is_mine = is_mine
-    self.reveald = false
+    self.revealed = false
     self.exploded = false
     self.visited = false
     self.count = 0
   end
 
   def reveal
-    self.reveald = true
+    self.revealed = true
   end
 
   def explode
@@ -38,12 +36,12 @@ class Cell
   end
 
   def to_s
-    if !reveald
-      return '＇'.flip
+    if !revealed
+      return CPAD ? '⃞'.flip : '＇'.flip
     elsif is_mine
       return exploded ? '＊'.bgred : '＊'.flip.blue
     elsif count == 0
-      return '＇'.gray
+      return CPAD ? '⃞'.grey : '＇'.gray
     elsif is_mine
     elsif count == 1
       return NUMS[count].bold.cyan
@@ -161,7 +159,7 @@ puts "\n    💣  MINE SWEEPER 💣\n"
   end
 end
 
-if ENV["HOME"] == "/home/coderpad"
+if CPAD
   puts "\n  Type 'r' to get start playing."
 else
   r
