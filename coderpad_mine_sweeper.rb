@@ -2,7 +2,7 @@
 
 SIZE = 10
 NUMS = '０１２３４５６７８９' # Special unicode
-LETS = 'ａｂｃｄｅｆｇｈｉｊ' # fill-width chars
+LETS = 'ａｂｃｄｅｆｇｈｉｊ' # full-width chars
 CPAD = ENV["HOME"] == "/home/coderpad"
 
 class String
